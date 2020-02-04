@@ -39,12 +39,9 @@ export abstract class DisplayObject extends EventEmitter
     public _mask: Container|MaskData;
     public _bounds: Bounds;
     public _localBounds: Bounds;
-<<<<<<< HEAD
     public _realTransform: Transform;
 
     protected _intrinsicBounds: Bounds;
-=======
->>>>>>> 6fc56e15cd57ad0a434af226d2ae1bca5a1a30f4
 
     protected _zIndex: number;
     protected _enabledFilters: Filter[];
