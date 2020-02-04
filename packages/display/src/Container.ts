@@ -446,7 +446,6 @@ export class Container extends DisplayObject
         }
 
         this._boundsID++;
-
         this.transform.updateTransform(this.parent.transform);
 
         // TODO: check render flags, how to process stuff here
@@ -527,7 +526,7 @@ export class Container extends DisplayObject
         const transformRef = this.transform;
         const parentRef = this.parent;
 
-        this.parent = null;
+        this.parent = this._tempDisplayObjectParent;
         this.transform = this._tempDisplayObjectParent.transform;
 
         const worldBounds = this._bounds;
@@ -546,6 +545,7 @@ export class Container extends DisplayObject
         }
 
         this._updateTransformSwapped();
+        this.parent = null;
         const bounds = this.getBounds(true, rect);
 
         this._unswapTransform();
