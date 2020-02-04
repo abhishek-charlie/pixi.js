@@ -39,10 +39,14 @@ export abstract class DisplayObject extends EventEmitter
     public _mask: Container|MaskData;
     public _bounds: Bounds;
     public _localBounds: Bounds;
+    public _realTransform: Transform;
+
+    protected _intrinsicBounds: Bounds;
 
     protected _zIndex: number;
     protected _enabledFilters: Filter[];
     protected _boundsID: number;
+    protected _intrinsicBoundsID: number;
     protected _boundsRect: Rectangle;
     protected _localBoundsRect: Rectangle;
     protected _destroyed: boolean;
@@ -257,6 +261,8 @@ export abstract class DisplayObject extends EventEmitter
          * @member {boolean}
          */
         this.isMask = false;
+
+        this._realTransform = this.transform;
 
         /**
          * DisplayObject default updateTransform, does not update children of container.

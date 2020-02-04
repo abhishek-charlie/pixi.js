@@ -438,6 +438,48 @@ export class Container extends DisplayObject
         }
     }
 
+    _updateTransformSwapped(): void
+    {
+        if (this.sortableChildren && this.sortDirty)
+        {
+            this.sortChildren();
+        }
+
+        this._boundsID++;
+
+        this.transform.updateTransform(this.parent.transform);
+
+        // TODO: check render flags, how to process stuff here
+        this.worldAlpha = this.alpha * this.parent.worldAlpha;
+
+        for (let i = 0, j = this.children.length; i < j; ++i)
+        {
+            const child = this.children[i];
+
+            if (child.visible)
+            {
+                child._realTransform = child.transform;
+                child.transform = child._tempDisplayObjectParent.transform;
+                child._realTransform.copyTo(child.transform, true);
+
+                child.updateTransform();
+            }
+        }
+    }
+
+    _unswapTransform(): void
+    {
+        for (let i = 0, j = this.children.length; i < j; ++i)
+        {
+            const child = this.children[i];
+
+            if (child.visible)
+            {
+                child.transform = child._realTransform;
+            }
+        }
+    }
+
     /**
      * Recalculates the bounds of the container.
      *
@@ -480,24 +522,41 @@ export class Container extends DisplayObject
         this._bounds.updateID = this._boundsID;
     }
 
-    public getLocalBounds(rect?: Rectangle, noTransformSideEffects = true): Rectangle
+    public getLocalBounds(rect?: Rectangle): Rectangle
     {
-        const result = super.getLocalBounds(rect);
+        const transformRef = this.transform;
+        const parentRef = this.parent;
 
-        if (noTransformSideEffects)
+        this.parent = null;
+        this.transform = this._tempDisplayObjectParent.transform;
+
+        const worldBounds = this._bounds;
+        const worldBoundsID = this._boundsID;
+
+        this._bounds = this._localBounds;
+
+        if (!rect)
         {
-            for (let i = 0, j = this.children.length; i < j; ++i)
+            if (!this._localBoundsRect)
             {
-                const child = this.children[i];
-
-                if (child.visible)
-                {
-                    child.updateTransform();
-                }
+                this._localBoundsRect = new Rectangle();
             }
+
+            rect = this._localBoundsRect;
         }
 
-        return result;
+        this._updateTransformSwapped();
+        const bounds = this.getBounds(true, rect);
+
+        this._unswapTransform();
+
+        this.parent = parentRef;
+        this.transform = transformRef;
+
+        this._bounds = worldBounds;
+        this._bounds.updateID += this._boundsID - worldBoundsID;// reflect side-effects
+
+        return bounds;
     }
 
     /**

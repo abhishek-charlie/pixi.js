@@ -264,6 +264,32 @@ export class Transform
     }
 
     /**
+     * Changes values in the given transform to that of this transform. It will
+     * not update matrices.
+     *
+     * @param {PIXI.Transform} transform
+     * @param {boolean}[onlyLocal=false] - only copy the local transform
+     */
+    copyTo(transform: Transform, onlyLocal = false): void
+    {
+        transform.position.copyFrom(this.position);
+        transform.scale.copyFrom(this.scale);
+        transform.pivot.copyFrom(this.pivot);
+        transform._rotation = this.rotation;
+        transform.skew.copyFrom(this.skew);
+
+        transform._localID = this._localID;
+        transform._currentLocalID = this._currentLocalID;
+
+        if (!onlyLocal)
+        {
+            transform.worldTransform.copyFrom(this.worldTransform);
+            transform._parentID = this._parentID;
+            transform._worldID = this._worldID;
+        }
+    }
+
+    /**
      * The rotation of the object in radians.
      *
      * @member {number}
