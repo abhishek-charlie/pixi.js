@@ -39,9 +39,12 @@ export abstract class DisplayObject extends EventEmitter
     public _mask: Container|MaskData;
     public _bounds: Bounds;
     public _localBounds: Bounds;
+<<<<<<< HEAD
     public _realTransform: Transform;
 
     protected _intrinsicBounds: Bounds;
+=======
+>>>>>>> 6fc56e15cd57ad0a434af226d2ae1bca5a1a30f4
 
     protected _zIndex: number;
     protected _enabledFilters: Filter[];
@@ -52,7 +55,7 @@ export abstract class DisplayObject extends EventEmitter
     protected _destroyed: boolean;
 
     private tempDisplayObjectParent: TemporaryDisplayObject;
-    private displayObjectUpdateTransform: () => void;
+    public displayObjectUpdateTransform: () => void;
 
     /**
      * Mixes all enumerable properties and methods from a source object to DisplayObject.
@@ -794,7 +797,7 @@ export abstract class DisplayObject extends EventEmitter
     {
         if (this._mask)
         {
-            const maskObject = (this._mask as MaskData).maskObject || (this._mask as Container);
+            const maskObject = ((this._mask as MaskData).maskObject || this._mask) as Container;
 
             maskObject.renderable = true;
             maskObject.isMask = false;
@@ -804,7 +807,7 @@ export abstract class DisplayObject extends EventEmitter
 
         if (this._mask)
         {
-            const maskObject = (this._mask as MaskData).maskObject || (this._mask as Container);
+            const maskObject = ((this._mask as MaskData).maskObject || this._mask) as Container;
 
             maskObject.renderable = false;
             maskObject.isMask = true;
@@ -812,10 +815,19 @@ export abstract class DisplayObject extends EventEmitter
     }
 }
 
-class TemporaryDisplayObject extends DisplayObject
+export class TemporaryDisplayObject extends DisplayObject
 {
     calculateBounds: () => {} = null;
     removeChild: (child: DisplayObject) => {} = null;
     render: (renderer: Renderer) => {} = null;
     sortDirty: boolean = null;
 }
+
+/**
+ * DisplayObject default updateTransform, does not update children of container.
+ * Will crash if there's no parent element.
+ *
+ * @memberof PIXI.DisplayObject#
+ * @function displayObjectUpdateTransform
+ */
+DisplayObject.prototype.displayObjectUpdateTransform = DisplayObject.prototype.updateTransform;
